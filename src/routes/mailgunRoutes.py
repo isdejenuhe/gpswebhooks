@@ -1,6 +1,6 @@
 import azure.functions as func
 import json
-
+import logging
 mailgunRoutes = func.Blueprint()
 
 
@@ -9,7 +9,9 @@ def getRespuesta(req: func.HttpRequest) -> func.HttpResponse:
     # Establecer la conexión
     try:
         content = req.get_body()
-        content = json.loads(content)
+        logging.info('%s', content)
+        content2 = json.loads(content)
+        logging.info('%s',content2)
         s_resultado = {
             "gracias":"muchas gracias"
         }
