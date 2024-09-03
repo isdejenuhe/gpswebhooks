@@ -1,6 +1,7 @@
 import azure.functions as func
 import json
-import logging
+from src.db.connectDBMongo import connectDB
+from datetime import datetime
 mailgunRoutes = func.Blueprint()
 
 
@@ -9,14 +10,17 @@ def getRespuesta(req: func.HttpRequest) -> func.HttpResponse:
     # Establecer la conexión
     try:
         content = req.get_body()
-        logging.info('%s', content)
         content2 = json.loads(content)
-        logging.info('%s',content2)
-        s_resultado = {
-            "gracias":"muchas gracias"
-        }
-        print(content)
-        return func.HttpResponse(json.dumps(s_resultado), mimetype="application/json")
+        s_correo = content2["event-data"]["recipient"]
+        proceso = content2["event-data"]["recipient"]
+        my_conection = connectDB("") #connectamos a la bd principal
+        notificaciones = my_conection["listaNegraCorreosElectronicos"] #connectamos a la bd principal
+        notificaciones.insert_one({
+            'correoElectronico': s_correo,
+            'proceso': str(content),
+            'creadoEl': datetime.utcnow()
+        })
+        return func.HttpResponse(json.dumps({"ok": True}), mimetype="application/json")
     except Exception as error:
         return func.HttpResponse(
             json.dumps({"error": f"{error}"}),
